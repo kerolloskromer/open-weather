@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Open Weather</string>
+
+    <string name="search">Search</string>
+
+    <string name="ok">OK</string>
+    <string name="settings">Settings</string>
+
+    <string name="fine_location_permission_rationale">The fine location permission is needed for core functionality.</string>
+    <string name="fine_permission_denied_explanation">Fine location permission was denied but is needed for core functionality.</string>
+    <string name="permission_approved_explanation">You approved FINE location, loading data…</string>
+
+    <string name="undo_message">Item has been removed</string>
+    <string name="undo">Undo</string>
+</resources>

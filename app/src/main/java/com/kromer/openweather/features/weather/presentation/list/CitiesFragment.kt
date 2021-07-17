@@ -151,6 +151,15 @@ class CitiesFragment : BaseFragment<FragmentCitiesBinding>() {
                 Status.SUCCESS -> {
                     hideLoading()
                     val city = it.data!!
+                    if (viewModel.permissionGranted.value?.not()!! && DEFAULT_CITY.contains(
+                            city.name
+                        )
+                    ) {
+                        // if permission not granted and this is London (default city)
+                        // add the default city directly without asking
+                        viewModel.addCity(city)
+                        return@observe
+                    }
                     Utils.showWarning(
                         getString(R.string.save_city_title),
                         getString(R.string.save_city_message, city.name),

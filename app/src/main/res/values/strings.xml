@@ -12,4 +12,9 @@
 
     <string name="undo_message">Item has been removed</string>
     <string name="undo">Undo</string>
+
+    <string name="save_city_title">Save City</string>
+    <string name="save_city_message">Do you want to save %s ?</string>
+    <string name="storage_limit">Storage limit is %d cities, please swipe to delete some data</string>
+
 </resources>

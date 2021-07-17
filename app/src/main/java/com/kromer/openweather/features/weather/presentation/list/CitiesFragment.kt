@@ -19,6 +19,7 @@ import com.kromer.openweather.R
 import com.kromer.openweather.core.network.Status
 import com.kromer.openweather.core.utils.MarginItemDecoration
 import com.kromer.openweather.core.utils.SwipeToDeleteCallback
+import com.kromer.openweather.core.utils.Utils
 import com.kromer.openweather.core.view.BaseFragment
 import com.kromer.openweather.core.view.extensions.hasPermission
 import com.kromer.openweather.core.view.extensions.hide
@@ -31,6 +32,12 @@ import timber.log.Timber
 
 @AndroidEntryPoint
 class CitiesFragment : BaseFragment<FragmentCitiesBinding>() {
+
+    companion object {
+        private const val REQUEST_FINE_LOCATION_PERMISSIONS_REQUEST_CODE = 34
+        const val STORAGE_LIMIT = 5
+        const val DEFAULT_CITY = "London,UK"
+    }
 
     private val viewModel: CitiesViewModel by viewModels()
     private val adapter: CitiesAdapter = CitiesAdapter { onItemClick(it) }
@@ -131,8 +138,8 @@ class CitiesFragment : BaseFragment<FragmentCitiesBinding>() {
         })
     }
 
-    private fun getWeather(city: String?, lat: Double?, lng: Double?) {
-        viewModel.getWeather(city, lat, lng).observe(viewLifecycleOwner, {
+    private fun getWeather(name: String?, lat: Double?, lng: Double?) {
+        viewModel.getWeather(name, lat, lng).observe(viewLifecycleOwner, {
             when (it.status) {
                 Status.LOADING -> {
                     showLoading()
@@ -145,6 +152,22 @@ class CitiesFragment : BaseFragment<FragmentCitiesBinding>() {
 
                 Status.SUCCESS -> {
                     hideLoading()
+                    val city = it.data?.city!!
+                    Utils.showWarning(
+                        getString(R.string.save_city_title),
+                        getString(R.string.save_city_message, city.name),
+                        requireContext()
+                    ) {
+                        if (adapter.itemCount == STORAGE_LIMIT) {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.storage_limit, STORAGE_LIMIT),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            viewModel.addCity(city)
+                        }
+                    }
                 }
             }
         })
@@ -156,7 +179,7 @@ class CitiesFragment : BaseFragment<FragmentCitiesBinding>() {
                 getLocation()
             } else {
                 showExplanation()
-                getWeather("London,UK", null, null)
+                getWeather(DEFAULT_CITY, null, null)
             }
         })
     }
@@ -244,10 +267,6 @@ class CitiesFragment : BaseFragment<FragmentCitiesBinding>() {
                 fineLocationRationalSnackbar
             )
         }
-    }
-
-    companion object {
-        private const val REQUEST_FINE_LOCATION_PERMISSIONS_REQUEST_CODE = 34
     }
 
     private fun showUndoSnackbar(city: City) {

@@ -13,11 +13,8 @@ class WeatherRepositoryImpl(
     private val weatherLocalDataSource: WeatherLocalDataSource
 ) :
     WeatherRepository {
-    override suspend fun getWeather(request: WeatherRequest): WeatherResponse {
-        val response = weatherRemoteDataSource.getWeather(request)
-        weatherLocalDataSource.insert(response.city)
-        return response
-    }
+    override suspend fun getWeather(request: WeatherRequest): WeatherResponse =
+        weatherRemoteDataSource.getWeather(request)
 
     override fun getAll(): LiveData<List<City>> = weatherLocalDataSource.getAll()
     override suspend fun getByName(name: String): City? = weatherLocalDataSource.getByName(name)

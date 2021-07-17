@@ -2,12 +2,12 @@ package com.kromer.openweather.features.weather.presentation.list
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.view.*
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -23,7 +23,6 @@ import com.kromer.openweather.core.utils.Utils
 import com.kromer.openweather.core.view.BaseFragment
 import com.kromer.openweather.core.view.extensions.hasPermission
 import com.kromer.openweather.core.view.extensions.hide
-import com.kromer.openweather.core.view.extensions.requestPermissionWithRationale
 import com.kromer.openweather.core.view.extensions.show
 import com.kromer.openweather.databinding.FragmentCitiesBinding
 import com.kromer.openweather.features.weather.domain.entities.City
@@ -34,7 +33,9 @@ import timber.log.Timber
 class CitiesFragment : BaseFragment<FragmentCitiesBinding>() {
 
     companion object {
-        private const val REQUEST_FINE_LOCATION_PERMISSIONS_REQUEST_CODE = 34
+        var PERMISSIONS = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
         const val STORAGE_LIMIT = 5
         const val DEFAULT_CITY = "London,UK"
     }
@@ -42,20 +43,17 @@ class CitiesFragment : BaseFragment<FragmentCitiesBinding>() {
     private val viewModel: CitiesViewModel by viewModels()
     private val adapter: CitiesAdapter = CitiesAdapter { onItemClick(it) }
 
-    // If the user denied a previous permission request, but didn't check "Don't ask again", this
-    // Snackbar provides an explanation for why user should approve, i.e., the additional rationale.
-    private val fineLocationRationalSnackbar by lazy {
-        Snackbar.make(
-            binding.container,
-            R.string.fine_location_permission_rationale,
-            Snackbar.LENGTH_LONG
-        ).setAction(R.string.ok) {
-            requestPermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_FINE_LOCATION_PERMISSIONS_REQUEST_CODE
-            )
+    private val permReqLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val granted = permissions.entries.all {
+                it.value == true
+            }
+            if (granted) {
+                viewModel.onLocationPermissionGranted()
+            } else {
+                viewModel.onLocationPermissionDenied()
+            }
         }
-    }
 
     override fun getVBInflater(): (LayoutInflater) -> FragmentCitiesBinding =
         FragmentCitiesBinding::inflate
@@ -152,7 +150,7 @@ class CitiesFragment : BaseFragment<FragmentCitiesBinding>() {
 
                 Status.SUCCESS -> {
                     hideLoading()
-                    val city = it.data?.city!!
+                    val city = it.data!!
                     Utils.showWarning(
                         getString(R.string.save_city_title),
                         getString(R.string.save_city_message, city.name),
@@ -228,30 +226,6 @@ class CitiesFragment : BaseFragment<FragmentCitiesBinding>() {
         viewModel.cancel()
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Timber.d("onRequestPermissionResult()")
-        if (requestCode == REQUEST_FINE_LOCATION_PERMISSIONS_REQUEST_CODE) {
-            when {
-                grantResults.isEmpty() -> {
-                    viewModel.onLocationPermissionDenied()
-                }
-
-                grantResults[0] == PackageManager.PERMISSION_GRANTED -> {
-                    viewModel.onLocationPermissionGranted()
-                }
-
-                else -> {
-                    viewModel.onLocationPermissionDenied()
-                }
-            }
-        }
-    }
-
     private fun checkAndRequestLocation() {
         Timber.d("checkAndRequestLocation()")
 
@@ -261,17 +235,13 @@ class CitiesFragment : BaseFragment<FragmentCitiesBinding>() {
         if (permissionApproved) {
             viewModel.onLocationPermissionGranted()
         } else {
-            requireActivity().requestPermissionWithRationale(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                REQUEST_FINE_LOCATION_PERMISSIONS_REQUEST_CODE,
-                fineLocationRationalSnackbar
-            )
+            permReqLauncher.launch(PERMISSIONS)
         }
     }
 
     private fun showUndoSnackbar(city: City) {
         val snackbar: Snackbar = Snackbar.make(
-            binding.root, getString(R.string.undo_message),
+            binding.container, getString(R.string.undo_message),
             Snackbar.LENGTH_LONG
         )
         snackbar.setAction(getString(R.string.undo)) { v -> viewModel.addCity(city) }

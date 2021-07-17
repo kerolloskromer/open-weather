@@ -3,9 +3,9 @@ package com.kromer.openweather.features.weather.data.repositories
 import androidx.lifecycle.LiveData
 import com.kromer.openweather.features.weather.data.datasources.local.WeatherLocalDataSource
 import com.kromer.openweather.features.weather.data.datasources.remote.WeatherRemoteDataSource
+import com.kromer.openweather.features.weather.domain.ObjectMapper
 import com.kromer.openweather.features.weather.domain.entities.City
 import com.kromer.openweather.features.weather.domain.entities.WeatherRequest
-import com.kromer.openweather.features.weather.domain.entities.WeatherResponse
 import com.kromer.openweather.features.weather.domain.repositories.WeatherRepository
 
 class WeatherRepositoryImpl(
@@ -13,8 +13,10 @@ class WeatherRepositoryImpl(
     private val weatherLocalDataSource: WeatherLocalDataSource
 ) :
     WeatherRepository {
-    override suspend fun getWeather(request: WeatherRequest): WeatherResponse =
-        weatherRemoteDataSource.getWeather(request)
+    override suspend fun getWeather(request: WeatherRequest): City {
+        val response = weatherRemoteDataSource.getWeather(request)
+        return ObjectMapper.mapWeatherResponseToCity(response)
+    }
 
     override fun getAll(): LiveData<List<City>> = weatherLocalDataSource.getAll()
     override suspend fun getByName(name: String): City? = weatherLocalDataSource.getByName(name)

@@ -1,32 +1,14 @@
 package com.kromer.openweather.features.weather.domain.entities
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 data class WeatherResponse(
-    @SerializedName("sys")
-    val sys: Sys,
-    @SerializedName("weather")
-    val weather: ArrayList<Weather> = ArrayList(),
-    @SerializedName("main")
-    val main: Main,
-    @SerializedName("wind")
-    val wind: Wind,
-    @SerializedName("rain")
-    val rain: Rain,
-    @SerializedName("clouds")
-    val clouds: Clouds,
-    @SerializedName("dt")
-    val dt: Float,
-    @SerializedName("id")
-    val id: Int,
-    @SerializedName("name")
-    val name: String,
     @SerializedName("cod")
     val cod: Float,
+    @SerializedName("list")
+    val list: ArrayList<ListObj>,
     @SerializedName("city")
-    val city: City
+    val city: CityObj
 )
 
 data class Weather(
@@ -43,11 +25,6 @@ data class Weather(
 data class Clouds(
     @SerializedName("all")
     val all: Float
-)
-
-data class Rain(
-    @SerializedName("3h")
-    val h3: Float
 )
 
 data class Wind(
@@ -70,25 +47,22 @@ data class Main(
     val temp_max: Float
 )
 
-data class Sys(
-    @SerializedName("country")
-    val country: String,
-    @SerializedName("sunrise")
-    val sunrise: Long,
-    @SerializedName("sunset")
-    val sunset: Long
+data class ListObj(
+    @SerializedName("dt")
+    val dt: Long,
+    @SerializedName("main")
+    val main: Main,
+    @SerializedName("weather")
+    val weather: ArrayList<Weather> = ArrayList(),
+    @SerializedName("clouds")
+    val clouds: Clouds,
+    @SerializedName("wind")
+    val wind: Wind,
+    @SerializedName("dt_txt")
+    val dt_txt: String,
 )
 
-data class Coord(
-    @SerializedName("lon")
-    val lon: Float,
-    @SerializedName("lat")
-    val lat: Float
-)
-
-@Entity(tableName = "cities")
-data class City(
-    @PrimaryKey
+data class CityObj(
     @SerializedName("id")
     val id: Long,
     @SerializedName("name")

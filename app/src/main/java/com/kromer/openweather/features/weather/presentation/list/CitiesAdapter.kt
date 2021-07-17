@@ -34,4 +34,6 @@ class CitiesAdapter(
                 oldItem == newItem
         }
     }
+
+    fun getCity(position: Int): City = getItem(position)
 }

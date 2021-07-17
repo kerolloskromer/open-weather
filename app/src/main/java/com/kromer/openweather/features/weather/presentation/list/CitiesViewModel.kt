@@ -1,25 +1,27 @@
 package com.kromer.openweather.features.weather.presentation.list
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
+import androidx.lifecycle.*
 import com.kromer.openweather.core.network.Resource
 import com.kromer.openweather.features.location.domain.usecases.CancelLocationRequestUseCase
 import com.kromer.openweather.features.location.domain.usecases.GetLocationUseCase
+import com.kromer.openweather.features.weather.domain.entities.City
 import com.kromer.openweather.features.weather.domain.entities.WeatherRequest
+import com.kromer.openweather.features.weather.domain.usecases.AddCityUseCase
+import com.kromer.openweather.features.weather.domain.usecases.DeleteCityUseCase
 import com.kromer.openweather.features.weather.domain.usecases.GetCitiesUseCase
-import com.kromer.openweather.features.weather.domain.usecases.GetCityByNameUseCase
 import com.kromer.openweather.features.weather.domain.usecases.GetWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class CitiesViewModel @Inject constructor(
     private val getWeatherUseCase: GetWeatherUseCase,
     private val getCitiesUseCase: GetCitiesUseCase,
-    private val getCityByNameUseCase: GetCityByNameUseCase,
+    private val addCityUseCase: AddCityUseCase,
+    private val deleteCityUseCase: DeleteCityUseCase,
     private val getLocationUseCase: GetLocationUseCase,
     private val cancelLocationRequestUseCase: CancelLocationRequestUseCase
 ) : ViewModel() {
@@ -39,12 +41,19 @@ class CitiesViewModel @Inject constructor(
 
     fun getAllCities() = getCitiesUseCase.call()
 
-    fun getCityByName(name: String) = liveData(Dispatchers.IO) {
-        emit(Resource.loading(data = null))
-        try {
-            emit(Resource.success(data = getCityByNameUseCase.call(name)))
-        } catch (exception: Exception) {
-            emit(Resource.error(data = null, message = exception.message ?: "Error Occurred!"))
+    fun addCity(city: City) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                addCityUseCase.call(city)
+            }
+        }
+    }
+
+    fun deleteCity(city: City) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                deleteCityUseCase.call(city)
+            }
         }
     }
 

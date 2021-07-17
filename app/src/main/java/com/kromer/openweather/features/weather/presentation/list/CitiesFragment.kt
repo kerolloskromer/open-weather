@@ -97,7 +97,9 @@ class CitiesFragment : BaseFragment<FragmentCitiesBinding>() {
 
         val swipeHandler = object : SwipeToDeleteCallback(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                showUndoSnackbar()
+                val city = adapter.getCity(viewHolder.adapterPosition)
+                viewModel.deleteCity(city)
+                showUndoSnackbar(city)
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
@@ -248,12 +250,12 @@ class CitiesFragment : BaseFragment<FragmentCitiesBinding>() {
         private const val REQUEST_FINE_LOCATION_PERMISSIONS_REQUEST_CODE = 34
     }
 
-    private fun showUndoSnackbar() {
+    private fun showUndoSnackbar(city: City) {
         val snackbar: Snackbar = Snackbar.make(
             binding.root, getString(R.string.undo_message),
             Snackbar.LENGTH_LONG
         )
-        snackbar.setAction(getString(R.string.undo)) { v -> }
+        snackbar.setAction(getString(R.string.undo)) { v -> viewModel.addCity(city) }
         snackbar.show()
     }
 }

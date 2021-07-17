@@ -9,4 +9,5 @@ class WeatherLocalDataSourceImpl(private val weatherDao: WeatherDao) :
     override suspend fun getByName(name: String): City? = weatherDao.getByName(name)
     override suspend fun getById(id: Long): City? = weatherDao.getById(id)
     override suspend fun insert(city: City) = weatherDao.insert(city)
+    override suspend fun delete(city: City) = weatherDao.delete(city)
 }

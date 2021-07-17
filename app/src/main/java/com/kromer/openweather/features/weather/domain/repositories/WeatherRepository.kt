@@ -10,4 +10,6 @@ interface WeatherRepository {
     fun getAll(): LiveData<List<City>>
     suspend fun getByName(name: String): City?
     suspend fun getById(id: Long): City?
+    suspend fun addCity(city: City)
+    suspend fun deleteCity(city: City)
 }

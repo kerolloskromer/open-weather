@@ -8,4 +8,5 @@ interface WeatherLocalDataSource {
     suspend fun getByName(name: String): City?
     suspend fun getById(id: Long): City?
     suspend fun insert(city: City)
+    suspend fun delete(city: City)
 }

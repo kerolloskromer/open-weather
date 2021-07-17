@@ -22,4 +22,6 @@ class WeatherRepositoryImpl(
     override fun getAll(): LiveData<List<City>> = weatherLocalDataSource.getAll()
     override suspend fun getByName(name: String): City? = weatherLocalDataSource.getByName(name)
     override suspend fun getById(id: Long): City? = weatherLocalDataSource.getById(id)
+    override suspend fun addCity(city: City) = weatherLocalDataSource.insert(city)
+    override suspend fun deleteCity(city: City) = weatherLocalDataSource.delete(city)
 }

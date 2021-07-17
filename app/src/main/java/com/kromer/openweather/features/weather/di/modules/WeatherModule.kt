@@ -9,10 +9,7 @@ import com.kromer.openweather.features.weather.data.datasources.remote.WeatherRe
 import com.kromer.openweather.features.weather.data.datasources.remote.WeatherRemoteDataSourceImpl
 import com.kromer.openweather.features.weather.data.repositories.WeatherRepositoryImpl
 import com.kromer.openweather.features.weather.domain.repositories.WeatherRepository
-import com.kromer.openweather.features.weather.domain.usecases.GetCitiesUseCase
-import com.kromer.openweather.features.weather.domain.usecases.GetCityByIdUseCase
-import com.kromer.openweather.features.weather.domain.usecases.GetCityByNameUseCase
-import com.kromer.openweather.features.weather.domain.usecases.GetWeatherUseCase
+import com.kromer.openweather.features.weather.domain.usecases.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -101,6 +98,26 @@ object WeatherModule {
         repository: WeatherRepository
     ): GetCityByIdUseCase {
         return GetCityByIdUseCase(
+            repository
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideAddCityUseCase(
+        repository: WeatherRepository
+    ): AddCityUseCase {
+        return AddCityUseCase(
+            repository
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideDeleteCityUseCase(
+        repository: WeatherRepository
+    ): DeleteCityUseCase {
+        return DeleteCityUseCase(
             repository
         )
     }

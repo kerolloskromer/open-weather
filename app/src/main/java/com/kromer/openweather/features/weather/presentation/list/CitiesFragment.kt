@@ -68,7 +68,10 @@ class CitiesFragment : BaseFragment<FragmentCitiesBinding>() {
         setupObservers()
         setupRecyclerView()
         getAllCities()
-        checkAndRequestLocation()
+        if (viewModel.shouldAskForLocation) {
+            checkAndRequestLocation()
+            viewModel.shouldAskForLocation = false
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

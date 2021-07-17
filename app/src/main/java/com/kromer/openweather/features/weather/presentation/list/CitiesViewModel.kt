@@ -1,7 +1,10 @@
 package com.kromer.openweather.features.weather.presentation.list
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.kromer.openweather.core.network.Resource
+import com.kromer.openweather.core.utils.SingleLiveEvent
 import com.kromer.openweather.features.location.domain.usecases.CancelLocationRequestUseCase
 import com.kromer.openweather.features.location.domain.usecases.GetLocationUseCase
 import com.kromer.openweather.features.weather.domain.entities.City
@@ -26,9 +29,8 @@ class CitiesViewModel @Inject constructor(
     private val cancelLocationRequestUseCase: CancelLocationRequestUseCase
 ) : ViewModel() {
 
-    private val _permissionGranted = MutableLiveData<Boolean>()
-    val permissionGranted: LiveData<Boolean>
-        get() = _permissionGranted
+    var shouldAskForLocation = true
+    val permissionGranted = SingleLiveEvent<Boolean>()
 
     fun getWeather(city: String?, lat: Double?, lng: Double?) = liveData(Dispatchers.IO) {
         emit(Resource.loading(data = null))
@@ -76,10 +78,10 @@ class CitiesViewModel @Inject constructor(
     }
 
     fun onLocationPermissionGranted() {
-        _permissionGranted.postValue(true)
+        permissionGranted.postValue(true)
     }
 
     fun onLocationPermissionDenied() {
-        _permissionGranted.postValue(false)
+        permissionGranted.postValue(false)
     }
 }

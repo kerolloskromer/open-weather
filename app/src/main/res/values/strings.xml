@@ -17,4 +17,8 @@
     <string name="save_city_message">Do you want to save %s ?</string>
     <string name="storage_limit">Storage limit is %d cities, please swipe to delete some data</string>
 
+    <string name="forecast_temp">Temperature: %.02f C</string>
+    <string name="forecast_humidity">Humidity: %.02f</string>
+    <string name="forecast_pressure">Pressure: %.02f</string>
+    <string name="forecast_description">Description: %s</string>
 </resources>

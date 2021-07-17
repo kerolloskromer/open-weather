@@ -2,6 +2,8 @@ package com.kromer.openweather.core.utils
 
 import android.content.Context
 import androidx.appcompat.app.AlertDialog
+import java.text.SimpleDateFormat
+import java.util.*
 
 object Utils {
     fun showWarning(title: String, message: String, context: Context, okClick: () -> Unit) {
@@ -19,5 +21,11 @@ object Utils {
         }
 
         builder.show()
+    }
+
+    fun getDate(timestamp: Long, context: Context): String? {
+        val sdf = SimpleDateFormat("EEEE dd/MM/yyyy", context.resources.configuration.locale)
+        val netDate = Date(timestamp * 1000)
+        return sdf.format(netDate)
     }
 }
